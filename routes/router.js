@@ -9,7 +9,7 @@ module.exports = function (app) {
     app.route('/books')
         .get(todoList.books);
 
-    app.route('/books/:user_id')
+    app.route('/books/:book_id')
         .get(todoList.findBooks);
 
     app.route('/books')
