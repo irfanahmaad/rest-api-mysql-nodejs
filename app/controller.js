@@ -34,7 +34,7 @@ exports.register = function (req, res) {
             if (error) {
                 console.log(error)
             } else {
-                response.ok(rows, res);
+                response.ok("User added!", res)
             }
         })
 }
@@ -44,7 +44,7 @@ exports.books = function (req, res) {
         if (error) {
             console.log(error)
         } else {
-            response.ok("User added!", res)
+            response.ok("book added!", res)
         }
     })
 }
