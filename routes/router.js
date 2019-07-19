@@ -6,6 +6,12 @@ module.exports = function (app) {
     app.route('/')
         .get(todoList.index);
 
+    app.route('/login')
+        .get(todoList.login);
+
+    app.route('/register')
+        .post(todoList.register);
+
     app.route('/books')
         .get(todoList.books);
 

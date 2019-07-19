@@ -2,31 +2,31 @@
 
 const response = require('../response/res')
 const connection = require('../conf/connection')
-const md5 = require('md5')
+const crypto = require('crypto')
 
 exports.index = function (req, res) {
     response.ok("Go to another stuff!", res)
 }
 
 exports.login = function (req, res) {
-    const email = req.params.email
-    const password = md5(req.params.password)
+    const email = req.body.email
+    const password = crypto.createHash('md5').update(req.body.password).digest("hex")
 
-    connection.query('SELECT * FROM users where email = ? and password = ?'
-    [email, password],
+    connection.query('SELECT * FROM users where email = ? and password = ?',
+        [email, password],
         function (error, rows, fields) {
-            if (error) {
-                console.log(error)
-            } else {
+            if (rows.length > 0) {
                 response.ok(rows, res)
+            } else {
+                response.ok("gagal", res)
             }
         })
 }
 
 exports.register = function (req, res) {
-    const name = req.params.name
-    const email = req.params.email
-    const password = md5(req.params.password)
+    const name = req.body.name
+    const email = req.body.email
+    const password = crypto.createHash('md5').update(req.body.password).digest("hex")
 
     connection.query('INSERT INTO users (name, email, password) VALUES (?,?,?)',
         [name, email, password],

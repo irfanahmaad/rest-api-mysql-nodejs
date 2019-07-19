@@ -10,4 +10,4 @@ app.use(bodyParser.json())
 const routes = require('./routes/router')
 routes(app)
 
-app.listen(3000)
+app.listen(8000)
