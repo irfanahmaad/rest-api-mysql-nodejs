@@ -3,12 +3,13 @@
 const response = require('../response/res')
 const connection = require('../conf/connection')
 const crypto = require('crypto')
+const upload = require('../conf/uploadMiddleware');
 
-exports.index = function (req, res) {
+exports.index = async function (req, res) {
     response.ok("Go to another stuff!", res)
 }
 
-exports.login = function (req, res) {
+exports.login = async function (req, res) {
     const email = req.body.email
     const password = crypto.createHash('md5').update(req.body.password).digest("hex")
 
@@ -23,7 +24,7 @@ exports.login = function (req, res) {
         })
 }
 
-exports.register = function (req, res) {
+exports.register = async function (req, res) {
     const name = req.body.name
     const email = req.body.email
     const password = crypto.createHash('md5').update(req.body.password).digest("hex")
@@ -39,7 +40,7 @@ exports.register = function (req, res) {
         })
 }
 
-exports.books = function (req, res) {
+exports.books = async function (req, res) {
     connection.query('SELECT * FROM book', function (error, rows, fields) {
         if (error) {
             console.log(error)
@@ -49,7 +50,7 @@ exports.books = function (req, res) {
     })
 }
 
-exports.findBooks = function (req, res) {
+exports.findBook = async function (req, res) {
 
     const book_id = req.params.book_id
 
@@ -64,12 +65,20 @@ exports.findBooks = function (req, res) {
         })
 }
 
-exports.createBook = function (req, res) {
+exports.createBook = upload.single('image'), async function (req, res) {
+    const imagePath = path.join(__dirname, '/public/images');
+    const fileUpload = new Resize(imagePath);
+
+    if (!req.file) {
+        res.status(401).json({error: 'Please provide an image'});
+    }
 
     const name = req.body.name
     const author = req.body.author
     const image = req.body.image
     const description = req.body.description
+
+    const filename = await fileUpload.save(req.file.buffer);
 
     connection.query('INSERT INTO book (name, author, image, description) values (?,?,?,?)',
         [name, author, image, description],
@@ -82,9 +91,9 @@ exports.createBook = function (req, res) {
         })
 }
 
-exports.updateBook = function (req, res) {
+exports.updateBook = async function (req, res) {
 
-    const book_id = req.body.book_id
+    const book_id = req.params.book_id
     const name = req.body.name
     const author = req.body.author
     const image = req.body.image
@@ -101,9 +110,9 @@ exports.updateBook = function (req, res) {
         })
 }
 
-exports.deleteBook = function (req, res) {
+exports.deleteBook = async function (req, res) {
 
-    const book_id = req.body.book_id;
+    const book_id = req.params.book_id;
 
     connection.query('DELETE FROM book WHERE id = ?',
         [book_id],

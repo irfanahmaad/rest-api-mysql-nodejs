@@ -6,6 +6,8 @@ const express = require('express'),
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(express.static('public'));
+app.set('view engine', 'ejs');
 
 const routes = require('./routes/router')
 routes(app)

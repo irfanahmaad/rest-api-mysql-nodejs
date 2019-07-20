@@ -15,15 +15,15 @@ module.exports = function (app) {
     app.route('/books')
         .get(todoList.books);
 
-    app.route('/books/:book_id')
-        .get(todoList.findBooks);
+    app.route('/book/:book_id')
+        .get(todoList.findBook);
 
-    app.route('/books')
+    app.route('/book')
         .post(todoList.createBook);
 
-    app.route('/books')
+    app.route('/book/:book_id')
         .put(todoList.updateBook);
 
-    app.route('/books')
+    app.route('/book/:book_id')
         .delete(todoList.deleteBook);
 };
