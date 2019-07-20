@@ -2,6 +2,7 @@
 
 module.exports = function (app) {
     const todoList = require('../app/controller');
+    const upload = require('../conf/uploadMiddleware');
 
     app.route('/')
         .get(todoList.index);
@@ -18,8 +19,8 @@ module.exports = function (app) {
     app.route('/book/:book_id')
         .get(todoList.findBook);
 
-    app.route('/book')
-        .post(todoList.createBook);
+    app.route('/books')
+        .post(upload.single('image'), todoList.createBook);
 
     app.route('/book/:book_id')
         .put(todoList.updateBook);

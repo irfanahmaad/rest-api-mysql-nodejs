@@ -3,7 +3,9 @@
 const response = require('../response/res')
 const connection = require('../conf/connection')
 const crypto = require('crypto')
-const upload = require('../conf/uploadMiddleware');
+const path = require('path')
+const Resize = require('../conf/Resize')
+const base_url = require('../conf/base_url')
 
 exports.index = async function (req, res) {
     response.ok("Go to another stuff!", res)
@@ -41,11 +43,11 @@ exports.register = async function (req, res) {
 }
 
 exports.books = async function (req, res) {
-    connection.query('SELECT * FROM book', function (error, rows, fields) {
+    connection.query('SELECT * FROM books', function (error, rows, fields) {
         if (error) {
             console.log(error)
         } else {
-            response.ok("book added!", res)
+            response.ok(rows, res)
         }
     })
 }
@@ -54,7 +56,7 @@ exports.findBook = async function (req, res) {
 
     const book_id = req.params.book_id
 
-    connection.query('SELECT * FROM book where id = ?',
+    connection.query('SELECT * FROM books where id = ?',
         [book_id],
         function (error, rows, fields) {
             if (error) {
@@ -65,23 +67,22 @@ exports.findBook = async function (req, res) {
         })
 }
 
-exports.createBook = upload.single('image'), async function (req, res) {
-    const imagePath = path.join(__dirname, '/public/images');
+exports.createBook = async function (req, res) {
+    const imagePath = path.join(__dirname, '../public/images');
     const fileUpload = new Resize(imagePath);
 
     if (!req.file) {
-        res.status(401).json({error: 'Please provide an image'});
+        res.status(401).json({ error: 'Please provide an image' });
     }
 
     const name = req.body.name
     const author = req.body.author
-    const image = req.body.image
     const description = req.body.description
 
     const filename = await fileUpload.save(req.file.buffer);
 
-    connection.query('INSERT INTO book (name, author, image, description) values (?,?,?,?)',
-        [name, author, image, description],
+    connection.query('INSERT INTO books (name, author, image, description) values (?,?,?,?)',
+        [name, author, base_url.base_url + filename, description],
         function (error, rows, fields) {
             if (error) {
                 console.log(error)
@@ -99,7 +100,7 @@ exports.updateBook = async function (req, res) {
     const image = req.body.image
     const description = req.body.description
 
-    connection.query('UPDATE book SET name = ?, author = ?, image = ?, description = ? WHERE id = ?',
+    connection.query('UPDATE books SET name = ?, author = ?, image = ?, description = ? WHERE id = ?',
         [name, author, image, description, book_id],
         function (error, rows, fields) {
             if (error) {
@@ -114,7 +115,7 @@ exports.deleteBook = async function (req, res) {
 
     const book_id = req.params.book_id;
 
-    connection.query('DELETE FROM book WHERE id = ?',
+    connection.query('DELETE FROM books WHERE id = ?',
         [book_id],
         function (error, rows, fields) {
             if (error) {
