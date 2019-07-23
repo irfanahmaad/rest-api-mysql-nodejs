@@ -1,1 +1,1 @@
-exports.base_url = "http://localhost/public/images/"
+exports.upload_path = "http://192.168.43.153:8000/images/"

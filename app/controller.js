@@ -19,7 +19,7 @@ exports.login = async function (req, res) {
         [email, password],
         function (error, rows, fields) {
             if (rows.length > 0) {
-                response.ok(rows, res)
+                response.ok(rows[0], res)
             } else {
                 response.ok("gagal", res)
             }
@@ -62,7 +62,7 @@ exports.findBook = async function (req, res) {
             if (error) {
                 console.log(error)
             } else {
-                response.ok(rows, res)
+                response.ok(rows[0], res)
             }
         })
 }
@@ -82,7 +82,7 @@ exports.createBook = async function (req, res) {
     const filename = await fileUpload.save(req.file.buffer);
 
     connection.query('INSERT INTO books (name, author, image, description) values (?,?,?,?)',
-        [name, author, base_url.base_url + filename, description],
+        [name, author, base_url.upload_path + filename, description],
         function (error, rows, fields) {
             if (error) {
                 console.log(error)
@@ -93,15 +93,22 @@ exports.createBook = async function (req, res) {
 }
 
 exports.updateBook = async function (req, res) {
+    const imagePath = path.join(__dirname, '../public/images')
+    const fileUpload = new Resize(imagePath)
+
+    if (!req.file) {
+        res.status(401).json({ error: 'Please provide an image' })
+    }
 
     const book_id = req.params.book_id
     const name = req.body.name
     const author = req.body.author
-    const image = req.body.image
     const description = req.body.description
 
+    const filename = await fileUpload.save(req.file.buffer)
+
     connection.query('UPDATE books SET name = ?, author = ?, image = ?, description = ? WHERE id = ?',
-        [name, author, image, description, book_id],
+        [name, author, base_url.upload_path + filename, description, book_id],
         function (error, rows, fields) {
             if (error) {
                 console.log(error)
